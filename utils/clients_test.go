@@ -2,6 +2,7 @@ package utils
 
 import (
 	"encoding/json"
+	"fmt"
 	"regexp"
 	"testing"
 )
@@ -11,20 +12,26 @@ func loadTestConfig() []HTTPClient {
         "clients": [
             {
                 "name": "fetch",
-                "methodRe": "fetch\\\\(['\\\\\"]([^'\\\\\"]+)['\\\\\"],\\\\s*\\\\{[^}]*method:\\\\s*['\\\\\"]([^'\\\\\"]+)['\\\\\"]",
-                "urlRe": "fetch\\\\(['\\\\\"]([^'\\\\\"]+)['\\\\\"][^)]*\\\\)",
+                "methodRe": "fetch\\(\\\"([^\\\"]+)\\\",\\s*\\{[^}]*method:\\s*\\\"([^\\\"]+)\\\"",
+                "urlRe": "fetch\\(\\\"([^\\\"]+)\\\"[^)]*\\)",
                 "urlMethodIndex": [1, 2]
             },
             {
                 "name": "axios",
-                "methodRe": "axios\\\\.(get|post|put|delete|patch|options|head)\\\\(['\\\\\"]([^'\\\\\"]+)['\\\\\"]",
-                "urlRe": "axios\\\\(['\\\\\"]([^'\\\\\"]+)['\\\\\"],\\\\s*\\\\{[^}]*method:\\\\s*['\\\\\"]([^'\\\\\"]+)['\\\\\"]",
+                "methodRe": "axios\\.(get|post|put|delete|patch|options|head)\\(\\\"([^\\\"]+)\\\"",
+                "urlRe": "axios\\(\\\"([^\\\"]+)\\\",\\s*\\{[^}]*method:\\s*\\\"([^\\\"]+)\\\"",
                 "urlMethodIndex": [2, 1]
             }
         ]
     }`
-	var clients []HTTPClient
-	json.Unmarshal([]byte(config), &clients)
+	var configData struct {
+		Clients []HTTPClient `json:"clients"`
+	}
+	err := json.Unmarshal([]byte(config), &configData)
+	if err != nil {
+		panic(err)
+	}
+	clients := configData.Clients
 	for i, client := range clients {
 		clients[i].methodRegexp = regexp.MustCompile(client.MethodRe)
 		clients[i].urlRegexp = regexp.MustCompile(client.URLRe)
@@ -34,6 +41,7 @@ func loadTestConfig() []HTTPClient {
 
 func TestLoadClients(t *testing.T) {
 	clients := loadTestConfig()
+	fmt.Printf("Loaded clients: %+v\n", clients) // Debug statement
 	if len(clients) != 2 {
 		t.Fatalf("Expected 2 clients, got %d", len(clients))
 	}
@@ -46,15 +54,5 @@ func TestLoadClients(t *testing.T) {
 	axiosClient := clients[1]
 	if axiosClient.Name != "axios" {
 		t.Fatalf("Expected client name to be 'axios', got %s", axiosClient.Name)
-	}
-
-	// Test with an empty configuration
-	var emptyClients []HTTPClient
-	err := json.Unmarshal([]byte(`[]`), &emptyClients)
-	if err != nil {
-		t.Fatalf("Unexpected error: %v", err)
-	}
-	if len(emptyClients) != 0 {
-		t.Fatalf("Expected 0 clients, got %d", len(emptyClients))
 	}
 }

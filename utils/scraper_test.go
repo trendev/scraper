@@ -29,6 +29,18 @@ func TestFetchHTML(t *testing.T) {
 	if result != expected {
 		t.Fatalf("Expected %v, got %v", expected, result)
 	}
+
+	// Test with a malformed URL
+	_, err = FetchHTML("http://%41:8080/")
+	if err == nil {
+		t.Fatalf("Expected error for malformed URL, got none")
+	}
+
+	// Test with a non-existent URL
+	_, err = FetchHTML("http://localhost:9999")
+	if err == nil {
+		t.Fatalf("Expected error for non-existent URL, got none")
+	}
 }
 
 func TestParseScripts(t *testing.T) {
@@ -39,7 +51,7 @@ func TestParseScripts(t *testing.T) {
                 <script src="test2.js"></script>
             </head>
         </html>`
-	expected := []string{"test1.js", "test2.js"}
+	expected := []string{"http://example.com/test1.js", "http://example.com/test2.js"}
 
 	result := ParseScripts(htmlContent, "http://example.com")
 	if len(result) != len(expected) {
@@ -49,6 +61,20 @@ func TestParseScripts(t *testing.T) {
 		if url != expected[i] {
 			t.Fatalf("Expected %v, got %v", expected[i], url)
 		}
+	}
+
+	// Test with no scripts
+	htmlContentNoScripts := `<html><head></head></html>`
+	resultNoScripts := ParseScripts(htmlContentNoScripts, "http://example.com")
+	if len(resultNoScripts) != 0 {
+		t.Fatalf("Expected 0 URLs, got %d", len(resultNoScripts))
+	}
+
+	// Test with malformed HTML
+	htmlContentMalformed := `<html><head><script src="test1.js"></script><script src="test2.js"></head></html`
+	resultMalformed := ParseScripts(htmlContentMalformed, "http://example.com")
+	if len(resultMalformed) != len(expected) {
+		t.Fatalf("Expected %d URLs, got %d", len(expected), len(resultMalformed))
 	}
 }
 
@@ -76,5 +102,16 @@ func TestExtractURLsAndMethods(t *testing.T) {
 				t.Fatalf("Expected method %v for URL %v to exist", method, url)
 			}
 		}
+	}
+
+	// Test with malformed JS content
+	jsContentMalformed := `
+        fetch("https://example.com/api", {method: "POST");
+        axios.get("https://example.com/axios"
+        axios.post("https://example.com/axios-post";
+    `
+	resultMalformed := ExtractURLs(jsContentMalformed, clients)
+	if len(resultMalformed) != 0 {
+		t.Fatalf("Expected 0 URLs, got %d", len(resultMalformed))
 	}
 }

@@ -47,4 +47,14 @@ func TestLoadClients(t *testing.T) {
 	if axiosClient.Name != "axios" {
 		t.Fatalf("Expected client name to be 'axios', got %s", axiosClient.Name)
 	}
+
+	// Test with an empty configuration
+	var emptyClients []HTTPClient
+	err := json.Unmarshal([]byte(`[]`), &emptyClients)
+	if err != nil {
+		t.Fatalf("Unexpected error: %v", err)
+	}
+	if len(emptyClients) != 0 {
+		t.Fatalf("Expected 0 clients, got %d", len(emptyClients))
+	}
 }

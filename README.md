@@ -2,6 +2,12 @@
 
 This project contains a Go-based scraper to extract URLs and HTTP methods from JavaScript files on a website.
 
+## Disclaimer
+
+This code was generated with the assistance of ChatGPT, a language model developed by OpenAI. While efforts have been made to ensure the accuracy and functionality of the code, it may still contain errors or require adjustments for specific use cases. Users are encouraged to review and test the code thoroughly before using it in a production environment.
+
+For any issues or further assistance, consider consulting additional resources or seeking help from experienced developers.
+
 ## Prerequisites
 
 - Go (version 1.16 or later)

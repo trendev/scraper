@@ -43,4 +43,3 @@ To use the scraper, pass the URL of the website you want to scrape as a command-
 ## Configuration
 
 The configuration for the HTTP clients (`fetch` and `axios`) is defined in a JSON file specified by the `-config` flag. Adjust the regex patterns as necessary to match the JavaScript syntax used on the target website.
-

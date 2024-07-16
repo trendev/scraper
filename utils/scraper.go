@@ -33,35 +33,34 @@ func FetchHTML(u string) (string, error) {
 }
 
 func ParseScripts(htmlContent, baseURL string) []string {
-	var scriptURLs []string
-	tokenizer := html.NewTokenizer(strings.NewReader(htmlContent))
-
-	parsedBaseURL, err := url.Parse(baseURL)
+	doc, err := html.Parse(strings.NewReader(htmlContent))
 	if err != nil {
 		return nil
 	}
 
-	for {
-		tokenType := tokenizer.Next()
-		if tokenType == html.ErrorToken {
-			break
-		}
-
-		token := tokenizer.Token()
-		if tokenType == html.StartTagToken && token.Data == "script" {
-			for _, attr := range token.Attr {
+	var scriptURLs []string
+	var f func(*html.Node)
+	f = func(n *html.Node) {
+		if n.Type == html.ElementNode && n.Data == "script" {
+			for _, attr := range n.Attr {
 				if attr.Key == "src" {
 					scriptURL := attr.Val
-					parsedScriptURL, err := url.Parse(scriptURL)
-					if err != nil {
-						continue
+					if !strings.HasPrefix(scriptURL, "http") {
+						base, err := url.Parse(baseURL)
+						if err != nil {
+							continue
+						}
+						scriptURL = base.ResolveReference(&url.URL{Path: scriptURL}).String()
 					}
-					resolvedURL := parsedBaseURL.ResolveReference(parsedScriptURL)
-					scriptURLs = append(scriptURLs, resolvedURL.String())
+					scriptURLs = append(scriptURLs, scriptURL)
 				}
 			}
 		}
+		for c := n.FirstChild; c != nil; c = c.NextSibling {
+			f(c)
+		}
 	}
+	f(doc)
 
 	return scriptURLs
 }

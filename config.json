@@ -1,40 +1,34 @@
 {
-    "clients": [
-        {
-            "name": "fetch",
-            "methodRe": "fetch\\(['\"]([^'\\\"]+)['\"],\\s*\\{[^}]*method:\\s*['\"]([^'\\\"]+)['\"]",
-            "urlRe": "fetch\\(['\"]([^'\\\"]+)['\"][^)]*\\)",
-            "urlMethodIndex": [1, 2]
-        },
-        {
-            "name": "axios",
-            "methodRe": "axios\\.(get|post|put|delete|patch|options|head)\\(['\"]([^'\\\"]+)['\"]",
-            "urlRe": "axios\\(['\"]([^'\\\"]+)['\"],\\s*\\{[^}]*method:\\s*['\"]([^'\\\"]+)['\"]",
-            "urlMethodIndex": [2, 1]
-        },
-        {
-            "name": "jquery",
-            "methodRe": "\\$.ajax\\(\\{[^}]*method:\\s*['\"]([^'\\\"]+)['\"],[^}]*url:\\s*['\"]([^'\\\"]+)['\"]",
-            "urlRe": "\\$.ajax\\(\\{[^}]*url:\\s*['\"]([^'\\\"]+)['\"][^}]*method:\\s*['\"]([^'\\\"]+)['\"]",
-            "urlMethodIndex": [2, 1]
-        },
-        {
-            "name": "xhr",
-            "methodRe": "xhr\\.open\\(['\"]([^'\\\"]+)['\"],\\s*['\"]([^'\\\"]+)['\"]",
-            "urlRe": "xhr\\.open\\(['\"]([^'\\\"]+)['\"],\\s*['\"]([^'\\\"]+)['\"]",
-            "urlMethodIndex": [1, 2]
-        },
-        {
-            "name": "superagent",
-            "methodRe": "superagent\\.(get|post|put|delete|patch|options|head)\\(['\"]([^'\\\"]+)['\"]",
-            "urlRe": "superagent\\.(get|post|put|delete|patch|options|head)\\(['\"]([^'\\\"]+)['\"]",
-            "urlMethodIndex": [2, 1]
-        },
-        {
-            "name": "qwest",
-            "methodRe": "qwest\\.(get|post|put|delete|patch|options|head)\\(['\"]([^'\\\"]+)['\"]",
-            "urlRe": "qwest\\.(get|post|put|delete|patch|options|head)\\(['\"]([^'\\\"]+)['\"]",
-            "urlMethodIndex": [2, 1]
-        }
-    ]
+	"clients": [
+		{
+			"name": "fetch",
+			"methodRe": "fetch\\(['\"]([^'\"]+)['\"],\\s*\\{[^}]*method:\\s*['\"]([^'\"]+)['\"]",
+			"urlRe": "fetch\\(['\"]([^'\"]+)['\"]",
+			"urlMethodIndex": [1, 2]
+		},
+		{
+			"name": "axios",
+			"methodRe": "axios\\.([a-zA-Z]+)\\(['\"]([^'\"]+)['\"]",
+			"urlRe": "axios\\.([a-zA-Z]+)\\(['\"]([^'\"]+)['\"]",
+			"urlMethodIndex": [1, 2]
+		},
+		{
+			"name": "jquery",
+			"methodRe": "\\$.ajax\\(\\{\\s*url:\\s*['\"]([^'\"]+)['\"],\\s*type:\\s*['\"]([^'\"]+)['\"]",
+			"urlRe": "\\$.ajax\\(\\{\\s*url:\\s*['\"]([^'\"]+)['\"]",
+			"urlMethodIndex": [1, 2]
+		},
+		{
+			"name": "xhr",
+			"methodRe": "xhr\\.open\\(['\"]([^'\"]+)['\"],\\s*['\"]([^'\"]+)['\"]",
+			"urlRe": "xhr\\.open\\(['\"]([^'\"]+)['\"]",
+			"urlMethodIndex": [1, 2]
+		},
+		{
+			"name": "httpclient",
+			"methodRe": "\\.httpClient\\.([a-zA-Z]+)\\(['\"]([^'\"]+)['\"]",
+			"urlRe": "\\.httpClient\\.([a-zA-Z]+)\\(['\"]([^'\"]+)['\"]",
+			"urlMethodIndex": [2, 1]
+		}
+	]
 }

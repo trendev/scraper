@@ -35,6 +35,11 @@ func ParseScripts(htmlContent, baseURL string) []string {
 	var scriptURLs []string
 	tokenizer := html.NewTokenizer(strings.NewReader(htmlContent))
 
+	parsedBaseURL, err := url.Parse(baseURL)
+	if err != nil {
+		return nil
+	}
+
 	for {
 		tokenType := tokenizer.Next()
 		if tokenType == html.ErrorToken {
@@ -46,10 +51,12 @@ func ParseScripts(htmlContent, baseURL string) []string {
 			for _, attr := range token.Attr {
 				if attr.Key == "src" {
 					scriptURL := attr.Val
-					if !strings.HasPrefix(scriptURL, "http") {
-						scriptURL = baseURL + scriptURL
+					parsedScriptURL, err := url.Parse(scriptURL)
+					if err != nil {
+						continue
 					}
-					scriptURLs = append(scriptURLs, scriptURL)
+					resolvedURL := parsedBaseURL.ResolveReference(parsedScriptURL)
+					scriptURLs = append(scriptURLs, resolvedURL.String())
 				}
 			}
 		}
@@ -61,6 +68,9 @@ func ParseScripts(htmlContent, baseURL string) []string {
 func FetchJS(u string) (string, error) {
 	client := &http.Client{
 		CheckRedirect: func(req *http.Request, via []*http.Request) error {
+			if len(via) >= 10 {
+				return http.ErrUseLastResponse
+			}
 			return nil
 		},
 	}
@@ -116,7 +126,7 @@ func ExtractAllURLs(scriptURLs []string, clients []HTTPClient, baseURL string) m
 	allExtracted := make(map[string]map[string]bool)
 	for _, scriptURL := range scriptURLs {
 		if !strings.HasPrefix(scriptURL, "http") {
-			scriptURL = baseURL + scriptURL
+			scriptURL = baseURL + "/" + scriptURL
 		}
 		jsContent, err := FetchJS(scriptURL)
 		if err != nil {

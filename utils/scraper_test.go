@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -85,7 +86,10 @@ func TestExtractURLsAndMethods(t *testing.T) {
         axios.post("https://example.com/axios-post");
     `
 	clients := loadTestConfig()
+	fmt.Printf("Loaded clients: %+v\n", clients) // Debug statement
+
 	result := ExtractURLs(jsContent, clients)
+	fmt.Printf("Extracted URLs and methods: %+v\n", result) // Debug statement
 
 	expected := map[string]map[string]bool{
 		"https://example.com/api":        {"POST": true},
@@ -111,6 +115,8 @@ func TestExtractURLsAndMethods(t *testing.T) {
         axios.post("https://example.com/axios-post";
     `
 	resultMalformed := ExtractURLs(jsContentMalformed, clients)
+	fmt.Printf("Extracted URLs and methods from malformed content: %+v\n", resultMalformed) // Debug statement
+
 	if len(resultMalformed) != 0 {
 		t.Fatalf("Expected 0 URLs, got %d", len(resultMalformed))
 	}

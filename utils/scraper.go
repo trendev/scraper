@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"fmt"
 	"io/ioutil"
 	"net/http"
 	"net/url"
@@ -92,30 +93,28 @@ func ExtractURLs(jsContent string, clients []HTTPClient) map[string]map[string]b
 
 	for _, client := range clients {
 		methodMatches := client.methodRegexp.FindAllStringSubmatch(jsContent, -1)
-		for _, match := range methodMatches {
-			if len(match) > client.URLMethodIndex[1] {
-				url := match[client.URLMethodIndex[0]]
-				method := match[client.URLMethodIndex[1]]
-				if _, exists := results[url]; !exists {
-					results[url] = make(map[string]bool)
-				}
-				results[url][strings.ToUpper(method)] = true
-			}
+		fmt.Printf("Method Matches for client %s: %+v\n", client.Name, methodMatches) // Debug statement
+
+		if len(methodMatches) == 0 {
+			fmt.Printf("No method matches for client %s\n", client.Name)
+			continue
 		}
 
-		urlMatches := client.urlRegexp.FindAllStringSubmatch(jsContent, -1)
-		for _, match := range urlMatches {
-			if len(match) > client.URLMethodIndex[0] {
-				url := match[client.URLMethodIndex[0]]
-				method := "GET"
-				if len(match) > 1 && client.URLMethodIndex[1] != 0 {
-					method = match[client.URLMethodIndex[1]]
-				}
-				if _, exists := results[url]; !exists {
-					results[url] = make(map[string]bool)
-				}
-				results[url][strings.ToUpper(method)] = true
+		for _, match := range methodMatches {
+			if len(client.URLMethodIndex) < 2 {
+				fmt.Printf("Skipping client %s due to insufficient URLMethodIndex\n", client.Name)
+				continue
 			}
+			if len(match) <= client.URLMethodIndex[0] || len(match) <= client.URLMethodIndex[1] {
+				fmt.Printf("Skipping match due to insufficient length: %+v\n", match)
+				continue
+			}
+			url := match[client.URLMethodIndex[0]]
+			method := match[client.URLMethodIndex[1]]
+			if _, exists := results[url]; !exists {
+				results[url] = make(map[string]bool)
+			}
+			results[url][strings.ToUpper(method)] = true
 		}
 	}
 

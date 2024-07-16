@@ -12,14 +12,14 @@ func loadTestConfig() []HTTPClient {
         "clients": [
             {
                 "name": "fetch",
-                "methodRe": "fetch\\(\\\"([^\\\"]+)\\\",\\s*\\{[^}]*method:\\s*\\\"([^\\\"]+)\\\"\\}",
+                "methodRe": "fetch\\(\\\"([^\\\"]+)\\\",\\s*\\{[^}]*method:\\s*\\\"([^\\\"]+)\\\"\\s*\\}",
                 "urlRe": "fetch\\(\\\"([^\\\"]+)\\\"\\)",
                 "urlMethodIndex": [1, 2]
             },
             {
                 "name": "axios",
-                "methodRe": "axios\\.(get|post|put|delete|patch|options|head)\\(\\\"([^\\\"]+)\\\"",
-                "urlRe": "axios\\(\\\"([^\\\"]+)\\\"\\)",
+                "methodRe": "axios\\.([a-z]+)\\(\\\"([^\\\"]+)\\\"\\s*(,\\s*\\{[^}]*\\})?\\)",
+                "urlRe": "axios\\.([a-z]+)\\(\\\"([^\\\"]+)\\\"\\s*(,\\s*\\{[^}]*\\})?\\)",
                 "urlMethodIndex": [2, 1]
             }
         ]
